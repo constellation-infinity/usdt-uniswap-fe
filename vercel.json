@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "BACKEND_URL": "https://blockchain-dashboard-backend.railway.app"
+  }
+}
