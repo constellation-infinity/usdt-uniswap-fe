@@ -1,28 +1,30 @@
 import React, { useState } from 'react'
 import { useBlockchain } from '../context/BlockchainContext'
+import { useNotification } from './NotificationSystem'
 
 const ActionsSection = () => {
-  const { wallet, showMessage } = useBlockchain()
+  const { wallet } = useBlockchain()
+  const { showError, showInfo } = useNotification()
   const [showSendModal, setShowSendModal] = useState(false)
 
   const handleSendTokens = () => {
     if (!wallet) {
-      showMessage('Please connect your wallet first', 'error')
+      showError('Please connect your wallet first')
       return
     }
     setShowSendModal(true)
   }
 
   const handleSwapTokens = () => {
-    showMessage('Swap functionality coming soon!', 'info')
+    showInfo('Swap functionality coming soon!')
   }
 
   const handleAddLiquidity = () => {
-    showMessage('Add liquidity functionality coming soon!', 'info')
+    showInfo('Add liquidity functionality coming soon!')
   }
 
   const handleViewAnalytics = () => {
-    showMessage('Analytics coming soon!', 'info')
+    showInfo('Analytics coming soon!')
   }
 
   return (

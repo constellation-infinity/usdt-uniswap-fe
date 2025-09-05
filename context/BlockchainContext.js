@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import axios from 'axios'
+import { useNotification } from '../components/NotificationSystem'
 
 const BlockchainContext = createContext(undefined)
 
@@ -18,6 +19,9 @@ export const BlockchainProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  
+  // Get notification functions
+  const { showSuccess, showError, showInfo, showWarning } = useNotification()
 
   // Load ETH price
   const loadETHPrice = async () => {
@@ -29,6 +33,7 @@ export const BlockchainProvider = ({ children }) => {
     } catch (error) {
       console.error('Error loading ETH price:', error)
       setEthPrice(4454.23) // Fallback price
+      showError('Failed to load ETH price from Uniswap V3')
     }
   }
 
@@ -95,14 +100,14 @@ export const BlockchainProvider = ({ children }) => {
           setWallet(accounts[0])
           await loadPortfolio()
           await loadTransactions()
-          showMessage('Wallet connected successfully!', 'success')
+          showSuccess('Wallet connected successfully!')
         }
       } else {
-        showMessage('MetaMask is not installed. Please install MetaMask to connect your wallet.', 'error')
+        showError('MetaMask is not installed. Please install MetaMask to connect your wallet.')
       }
     } catch (error) {
       console.error('Error connecting wallet:', error)
-      showMessage('Failed to connect wallet', 'error')
+      showError('Failed to connect wallet')
     }
   }
 
@@ -111,7 +116,7 @@ export const BlockchainProvider = ({ children }) => {
     setWallet(null)
     setPortfolio({ ETH: 0, USDT: 0 })
     setTransactions([])
-    showMessage('Wallet disconnected', 'info')
+    showInfo('Wallet disconnected')
   }
 
   // Refresh portfolio
@@ -119,9 +124,9 @@ export const BlockchainProvider = ({ children }) => {
     setIsLoading(true)
     try {
       await loadPortfolio()
-      showMessage('Portfolio refreshed', 'success')
+      showSuccess('Portfolio refreshed successfully')
     } catch (error) {
-      showMessage('Failed to refresh portfolio', 'error')
+      showError('Failed to refresh portfolio')
     } finally {
       setIsLoading(false)
     }
@@ -130,18 +135,18 @@ export const BlockchainProvider = ({ children }) => {
   // Send tokens
   const sendTokens = async (recipient, amount, token) => {
     if (!wallet) {
-      showMessage('Please connect your wallet first', 'error')
+      showError('Please connect your wallet first')
       return
     }
 
     if (amount > portfolio[token]) {
-      showMessage(`Insufficient ${token} balance`, 'error')
+      showError(`Insufficient ${token} balance`)
       return
     }
 
     try {
       // In a real implementation, you would send a transaction
-      showMessage('Transaction sent!', 'success')
+      showSuccess(`Successfully sent ${amount} ${token} to ${recipient.slice(0, 6)}...${recipient.slice(-4)}`)
       
       // Update portfolio
       setPortfolio(prev => ({
@@ -164,7 +169,7 @@ export const BlockchainProvider = ({ children }) => {
       
     } catch (error) {
       console.error('Error sending tokens:', error)
-      showMessage('Failed to send tokens', 'error')
+      showError('Failed to send tokens')
     }
   }
 

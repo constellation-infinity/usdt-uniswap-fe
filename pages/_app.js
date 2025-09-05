@@ -1,10 +1,11 @@
 import React from 'react'
 import Head from 'next/head'
 import '../styles/globals.css'
+import { NotificationProvider } from '../components/NotificationSystem'
 
 export default function App({ Component, pageProps }) {
   return (
-    <>
+    <NotificationProvider>
       <Head>
         <title>Blockchain Dashboard</title>
         <meta name="description" content="Modern blockchain dashboard with real-time ETH price tracking - Updated 2025" />
@@ -14,6 +15,6 @@ export default function App({ Component, pageProps }) {
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       </Head>
       <Component {...pageProps} />
-    </>
+    </NotificationProvider>
   )
 }
