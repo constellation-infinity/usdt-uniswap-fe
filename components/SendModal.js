@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useBlockchain } from '../context/BlockchainContext'
 
 const SendModal = () => {
@@ -45,58 +46,213 @@ const SendModal = () => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    },
+    exit: { 
+      opacity: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeIn"
+      }
+    }
+  }
+
+  const modalVariants = {
+    hidden: { 
+      opacity: 0, 
+      scale: 0.8, 
+      y: 50 
+    },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut",
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.8, 
+      y: 50,
+      transition: {
+        duration: 0.2,
+        ease: "easeIn"
+      }
+    }
+  }
+
+  const formVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+        delay: 0.2,
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const fieldVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  }
+
+  const buttonVariants = {
+    rest: { scale: 1 },
+    hover: { 
+      scale: 1.05,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut"
+      }
+    },
+    tap: { 
+      scale: 0.95,
+      transition: {
+        duration: 0.1
+      }
+    }
+  }
+
   return (
-    <div className={`modal ${isOpen ? 'active' : ''}`}>
-      <div className="modal-content">
-        <div className="modal-header">
-          <h3>Send Tokens</h3>
-          <button className="modal-close" onClick={handleClose}>
-            <i className="fas fa-times"></i>
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body">
-            <div className="form-group">
-              <label>Recipient Address</label>
-              <input
-                type="text"
-                value={recipient}
-                onChange={(e) => setRecipient(e.target.value)}
-                placeholder="0x..."
-                required
-              />
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          className="modal active"
+          variants={backdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          onClick={handleClose}
+        >
+          <motion.div 
+            className="modal-content"
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <motion.h3
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Send Tokens
+              </motion.h3>
+              <motion.button 
+                className="modal-close" 
+                onClick={handleClose}
+                variants={buttonVariants}
+                initial="rest"
+                whileHover="hover"
+                whileTap="tap"
+              >
+                <i className="fas fa-times"></i>
+              </motion.button>
             </div>
-            <div className="form-group">
-              <label>Amount</label>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.0"
-                step="0.0001"
-                min="0"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Token</label>
-              <select value={token} onChange={(e) => setToken(e.target.value)}>
-                <option value="ETH">ETH</option>
-                <option value="USDT">USDT</option>
-              </select>
-            </div>
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={handleClose}>
-              Cancel
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Send
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            <motion.form 
+              onSubmit={handleSubmit}
+              variants={formVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="modal-body">
+                <motion.div className="form-group" variants={fieldVariants}>
+                  <label>Recipient Address</label>
+                  <motion.input
+                    type="text"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                    placeholder="0x..."
+                    required
+                    whileFocus={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </motion.div>
+                <motion.div className="form-group" variants={fieldVariants}>
+                  <label>Amount</label>
+                  <motion.input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.0"
+                    step="0.0001"
+                    min="0"
+                    required
+                    whileFocus={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </motion.div>
+                <motion.div className="form-group" variants={fieldVariants}>
+                  <label>Token</label>
+                  <motion.select 
+                    value={token} 
+                    onChange={(e) => setToken(e.target.value)}
+                    whileFocus={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <option value="ETH">ETH</option>
+                    <option value="USDT">USDT</option>
+                  </motion.select>
+                </motion.div>
+              </div>
+              <motion.div 
+                className="modal-footer"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <motion.button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={handleClose}
+                  variants={buttonVariants}
+                  initial="rest"
+                  whileHover="hover"
+                  whileTap="tap"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  variants={buttonVariants}
+                  initial="rest"
+                  whileHover="hover"
+                  whileTap="tap"
+                >
+                  Send
+                </motion.button>
+              </motion.div>
+            </motion.form>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
